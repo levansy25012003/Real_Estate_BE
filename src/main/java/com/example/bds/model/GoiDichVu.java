@@ -1,5 +1,6 @@
 package com.example.bds.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
@@ -18,41 +19,46 @@ public class GoiDichVu {
     private Integer id;
 
     @Column(name = "ten")
-    private String ten;
+    private String name;
 
     @Column(name = "hienThiNgay")
-    private Boolean hienThiNgay = false;
+    private Boolean isDisplayedImmediately = false;
 
     @Column(name = "hienThiNguoiBan")
-    private Boolean hienThiNguoiBan = false;
+    private Boolean isDisplayedSeller = false;
 
     @Column(name = "hienThiNutGoiDien")
-    private Boolean hienThiNutGoiDien = false;
+    private Boolean isDisplayedPhoneBtn = false;
 
     @Column(name = "hienThiMoTa")
-    private Boolean hienThiMoTa = false;
+    private Boolean isDisplayedDescription = false;
 
     @Column(name = "kichThuocAnh")
-    private String kichThuocAnh;
+    private String imageSize;
 
     @Column(name = "doUuTien")
-    private Integer doUuTien;
+    private Integer priority;
 
     @Column(name = "diemYeuCau")
-    private Integer diemYeuCau;
+    private Integer requiredScore;
 
     @Column(name = "diemYeuCauDenCapDoTiep")
-    private Integer diemYeuCauDenCapDoTiep;
+    private Integer requiredScoreNextLevel;
 
     @Column(name = "gia")
-    private Integer gia;
+    private Integer price;
 
     @Column(name = "ngayHetHan")
-    private Integer ngayHetHan;
+    private Integer expiredDay;
 
     @Column(name = "urlHinhAnh")
-    private String urlHinhAnh;
+    private String imageUrl;
 
     @OneToMany(mappedBy = "maGiaHienTai")
+    @JsonManagedReference
     private List<TaiKhoan> taiKhoans;
+
+    @OneToMany(mappedBy = "goiDichVu")
+    @JsonManagedReference
+    private List<BatDongSan> danhSachBatDongSan;
 }

@@ -2,8 +2,9 @@ package com.example.bds.repository;
 
 import com.example.bds.model.BatDongSan;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BatDongSanRepository extends JpaRepository<BatDongSan,Integer> {
+public interface BatDongSanRepository extends JpaRepository<BatDongSan,Integer>, JpaSpecificationExecutor<BatDongSan> {
 }

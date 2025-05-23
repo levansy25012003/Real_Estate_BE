@@ -1,5 +1,6 @@
 package com.example.bds.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
@@ -53,9 +54,8 @@ public class BatDongSan {
     @Column(name = "moTa", columnDefinition = "TEXT")
     private String moTa;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "loaiBatDongSan", columnDefinition = "ENUM('Nhà', 'Đất', 'Chung cư')")
-    private LoaiBatDongSan loaiBatDongSan;
+    @Column(name = "loaiBatDongSan")
+    private String loaiBatDongSan;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "loaiDanhSach", columnDefinition = "ENUM('Bán', 'Cho thuê')")
@@ -108,17 +108,16 @@ public class BatDongSan {
 
     @ManyToOne
     @JoinColumn(name = "maGoiDichVu")
+    @JsonBackReference
     private GoiDichVu goiDichVu;
 
     @ManyToOne
     @JoinColumn(name = "maTaiKhoan")
+    @JsonBackReference
     private TaiKhoan taiKhoan;
 
 
 
-    public enum LoaiBatDongSan {
-        Nhà, Đất, Chung_cư
-    }
 
     public enum LoaiDanhSach {
         Bán, Cho_thuê

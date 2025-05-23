@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,13 +18,13 @@ public class CreatePostRequest {
     private String district;
     private String ward;
 
-    private Double price;
+    private Integer price;
     private Integer priceUnit;
     private Integer idPricing;
 
     private List<String> tags;
 
-    private Double size;
+    private Integer size;
     private Integer floor;
     private Integer bedroom;
     private Integer bathroom;
@@ -34,7 +35,6 @@ public class CreatePostRequest {
     private String direction;
     private String balonyDirection;
     private Boolean isFurniture;
-
-    private LocalDate expiredDate;
+    private Date expiredDate;
     private List<String> media;
 }

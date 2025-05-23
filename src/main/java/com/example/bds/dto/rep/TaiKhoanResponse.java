@@ -1,6 +1,9 @@
 package com.example.bds.dto.rep;
 
+import com.example.bds.dto.req.GoiDichVuDto;
 import com.example.bds.model.DanhSachYeuThich;
+import com.example.bds.model.GoiDichVu;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,5 +29,8 @@ public class TaiKhoanResponse {
     private boolean phoneVerified;
     private boolean emailVerified;
     private Integer currentPricingId;
+
+    @JsonProperty("rPricing")
+    private GoiDichVuDto rPricing;
     private List<DanhSachYeuThich> wishlist;
 }

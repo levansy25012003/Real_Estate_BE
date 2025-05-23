@@ -83,6 +83,8 @@ CREATE TABLE BATDONGSAN (
     FOREIGN KEY (maGoiDichVu) REFERENCES GOIDICHVU(maGoiDichVu),
     FOREIGN KEY (maTaiKhoan) REFERENCES TAIKHOAN(maTaiKhoan)
 );
+ALTER TABLE BATDONGSAN
+    MODIFY COLUMN loaiBatDongSan VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE DANHSACHYEUTHICH (
   maDsYeuThich INT AUTO_INCREMENT PRIMARY KEY,
@@ -209,3 +211,5 @@ where t.email = :email;
 select * from taikhoan;
 
 UPDATE taikhoan SET dienThoai = :phone, dienThoaiXacThuc = true WHERE maTaiKhoan = :id;
+
+select * from BATDONGSAN;

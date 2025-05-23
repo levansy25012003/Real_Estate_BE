@@ -31,9 +31,10 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class) // 👈 Thêm bộ lọc JWT
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/auth/**", "/user/**", "/post/**").permitAll()
-                        .anyRequest().authenticated()
+                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll()
+//                        .requestMatchers("/auth/**", "/user/**", "/post/**").permitAll()
+//
+//                        .anyRequest().authenticated()
                 );
         return http.build();
     }

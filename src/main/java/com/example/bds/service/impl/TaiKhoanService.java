@@ -2,7 +2,9 @@ package com.example.bds.service.impl;
 
 import com.example.bds.component.JwtTokenUtil;
 import com.example.bds.dto.rep.TaiKhoanResponse;
+import com.example.bds.dto.req.GoiDichVuDto;
 import com.example.bds.exception.DataNotFoundException;
+import com.example.bds.model.GoiDichVu;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.TaiKhoanRepository;
 import com.example.bds.service.ITaiKhoanService;
@@ -86,10 +88,30 @@ public class TaiKhoanService implements ITaiKhoanService {
                         .phoneVerified(tk.getDienThoaiXacThuc())
                         .emailVerified(tk.getEmailXacThuc())
                         .currentPricingId(tk.getMaGiaHienTai() != null ? tk.getMaGiaHienTai().getId() : null)
+                        .rPricing(mapGoiDichVuToDto(tk.getMaGiaHienTai()))
                         .wishlist(tk.getDanhSachYeuThiches())
                         .build()
                 )
                 .orElseThrow(() -> new DataNotFoundException("Không tìm thấy user."));
         return dto;
     }
+    private GoiDichVuDto mapGoiDichVuToDto(GoiDichVu entity) {
+        if (entity == null) return null;
+        return GoiDichVuDto.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .isDisplayedImmediately(entity.getIsDisplayedImmediately())
+                .isDisplayedSeller(entity.getIsDisplayedSeller())
+                .isDisplayedPhoneBtn(entity.getIsDisplayedPhoneBtn())
+                .isDisplayedDescription(entity.getIsDisplayedDescription())
+                .imageSize(entity.getImageSize())
+                .priority(entity.getPriority())
+                .requiredScore(entity.getRequiredScore())
+                .requiredScoreNextLevel(entity.getRequiredScoreNextLevel())
+                .price(entity.getPrice())
+                .expiredDay(entity.getExpiredDay())
+                .imageUrl(entity.getImageUrl())
+                .build();
+    }
+
 }

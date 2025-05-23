@@ -51,7 +51,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authenticationToken  = new UsernamePasswordAuthenticationToken(
                             userDetails,null, userDetails.getAuthorities());
                     authenticationToken .setDetails((new WebAuthenticationDetailsSource().buildDetails(request)));
+                    System.out.println("Before setting SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
+
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                    System.out.println("After setting SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
                 }
 //                filterChain.doFilter(request, response);
             }
@@ -59,7 +63,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorize");
         }
-
     }
 
     private boolean isBypassToken(HttpServletRequest request) {
