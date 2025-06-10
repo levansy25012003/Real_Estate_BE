@@ -32,5 +32,6 @@ public class TaiKhoanResponse {
 
     @JsonProperty("rPricing")
     private GoiDichVuDto rPricing;
-    private List<DanhSachYeuThich> wishlist;
+    @JsonProperty("rWishlist")
+    private List<WishlistRepDto> rWishlist;
 }

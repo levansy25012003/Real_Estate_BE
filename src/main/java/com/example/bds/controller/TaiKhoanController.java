@@ -2,12 +2,15 @@ package com.example.bds.controller;
 
 import com.example.bds.dto.rep.ApiResponse;
 import com.example.bds.dto.rep.TaiKhoanResponse;
+import com.example.bds.dto.rep.WishlistRepDto;
 import com.example.bds.dto.req.SendOtpRequest;
 import com.example.bds.dto.req.VerifyOtpRequest;
 import com.example.bds.dto.req.WishlistReqDto;
 import com.example.bds.exception.DataNotFoundException;
+import com.example.bds.model.DanhSachYeuThich;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.TaiKhoanRepository;
+import com.example.bds.service.IDanhSachYeuThichService;
 import com.example.bds.service.impl.TaiKhoanService;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
@@ -20,6 +23,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -32,6 +36,7 @@ public class TaiKhoanController {
     private String serviceSid;
     private final TaiKhoanService taiKhoanService;
     private final TaiKhoanRepository taiKhoanRepository;
+    private final IDanhSachYeuThichService danhSachYeuThichService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
@@ -108,16 +113,18 @@ public class TaiKhoanController {
     }
 
     @GetMapping("/wishlist")
-    public ResponseEntity<?> getWishlist() {
-
-        String a = "aa";
-        return null;
+    public ResponseEntity<?> getWishlist(@AuthenticationPrincipal TaiKhoan taiKhoan) {
+        List<WishlistRepDto> wishlistRepDtos = danhSachYeuThichService.getAllWishlistByTaiKhoan(taiKhoan.getId());
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "wls", wishlistRepDtos
+        ));
     }
 
     @PutMapping("/wishlist")
-    public ResponseEntity<?> addWishlist(@RequestBody WishlistReqDto req) {
-
-        String a = "aa";
-        return null;
+    public ResponseEntity<?> addWishlist(@RequestBody WishlistReqDto req,
+                                         @AuthenticationPrincipal TaiKhoan taiKhoan) {
+        String message = danhSachYeuThichService.toggleWishlist(req.getIdProperty(), taiKhoan.getId());
+        return ResponseEntity.ok(new ApiResponse(true, message));
     }
 }

@@ -2,6 +2,7 @@ package com.example.bds.service.impl;
 
 import com.example.bds.component.JwtTokenUtil;
 import com.example.bds.dto.rep.TaiKhoanResponse;
+import com.example.bds.dto.rep.WishlistRepDto;
 import com.example.bds.dto.req.GoiDichVuDto;
 import com.example.bds.exception.DataNotFoundException;
 import com.example.bds.model.GoiDichVu;
@@ -17,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -75,7 +78,9 @@ public class TaiKhoanService implements ITaiKhoanService {
 
         String email = auth.getName();
         TaiKhoanResponse dto = taiKhoanRepository.findByWithDetailByEmail(email)
-                .map(tk -> TaiKhoanResponse.builder()
+                .map(tk -> {
+                            List<WishlistRepDto> wishlistDtos = WishlistRepDto.fromEntity(new ArrayList<>(tk.getDanhSachYeuThiches()));
+                         return TaiKhoanResponse.builder()
                         .email(tk.getEmail())
                         .id(tk.getId())
                         .fullname(tk.getHoVaTen())
@@ -89,9 +94,9 @@ public class TaiKhoanService implements ITaiKhoanService {
                         .emailVerified(tk.getEmailXacThuc())
                         .currentPricingId(tk.getMaGiaHienTai() != null ? tk.getMaGiaHienTai().getId() : null)
                         .rPricing(mapGoiDichVuToDto(tk.getMaGiaHienTai()))
-                        .wishlist(tk.getDanhSachYeuThiches())
-                        .build()
-                )
+                        .rWishlist(wishlistDtos)
+                        .build();
+                })
                 .orElseThrow(() -> new DataNotFoundException("Không tìm thấy user."));
         return dto;
     }

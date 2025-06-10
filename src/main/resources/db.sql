@@ -216,3 +216,4 @@ select * from BATDONGSAN;
 
 select * from BINHLUAN;
 select * from DANHGIA;
+select * from DANHSACHYEUTHICH;
