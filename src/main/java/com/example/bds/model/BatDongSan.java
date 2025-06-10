@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "BATDONGSAN")
@@ -116,8 +118,11 @@ public class BatDongSan {
     @JsonBackReference
     private TaiKhoan taiKhoan;
 
+    @OneToMany(mappedBy = "batDongSan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BinhLuan> binhLuans = new ArrayList<>();
 
-
+    @OneToMany(mappedBy = "batDongSan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DanhGia> danhGias = new ArrayList<>();
 
     public enum LoaiDanhSach {
         Bán, Cho_thuê

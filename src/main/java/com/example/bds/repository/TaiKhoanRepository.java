@@ -35,4 +35,7 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Integer> {
     """,nativeQuery = true)
     int updatePhoneAndVerified(@Param("id") Integer id, @Param("phone") String phone);
 
+    @Modifying
+    @Query("UPDATE TaiKhoan t SET t.diemTichLuy = t.diemTichLuy + :points WHERE t.id = :id")
+    void incrementScoreById(@Param("points") int points, @Param("id") int id);
 }

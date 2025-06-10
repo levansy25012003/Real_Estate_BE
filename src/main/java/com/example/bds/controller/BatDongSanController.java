@@ -1,20 +1,24 @@
 package com.example.bds.controller;
 
-import com.example.bds.dto.rep.ApiResponse;
-import com.example.bds.dto.rep.BatDongSanDTO;
-import com.example.bds.dto.rep.Pagination;
-import com.example.bds.dto.rep.ProductResponseDTO;
+import com.example.bds.dto.rep.*;
+import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
+import com.example.bds.dto.req.RatingDTO;
 import com.example.bds.model.BatDongSan;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.service.IBatDongSanService;
-import lombok.Getter;
+import com.example.bds.service.IBinhLuanService;
+import com.example.bds.service.IDanhGiaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 public class BatDongSanController {
 
     private final IBatDongSanService batDongSanService;
+    private final IDanhGiaService danhGiaService;
+    private final IBinhLuanService binhLuanService;
 
     @PostMapping("/new")
     public ResponseEntity<?> createBatDongSan(@RequestBody CreatePostRequest request) {
@@ -46,7 +52,7 @@ public class BatDongSanController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         TaiKhoan currentUser = (TaiKhoan) authentication.getPrincipal();
 
-        Page<BatDongSan> resultPage = batDongSanService.getProductByOwn(title, propertyType, status, page, limit, sort, order, currentUser.getId());
+        Page<BatDongSan> resultPage = batDongSanService.getProductByOwn(title, propertyType, status, currentUser.getId(), page, limit, sort, order);
         Page<BatDongSanDTO> pageDto = resultPage.map(BatDongSanDTO::fromEntity);
         ProductResponseDTO<BatDongSanDTO> response = ProductResponseDTO.<BatDongSanDTO>builder()
                 .success(true)
@@ -61,4 +67,101 @@ public class BatDongSanController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/public")
+    public ResponseEntity<?> getBatDongSan(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(required = false) String price,
+            @RequestParam(required = false) String size,
+            @RequestParam(required = false) String address,
+            @RequestParam(required = false) String listingType,
+            @RequestParam(required = false) Integer bedroom,
+            @RequestParam(required = false) Integer bathroom,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String propertyType
+    ) {
+        List<Integer> sizeRange = parseIntList(size);
+        List<Integer> priceRange = parseIntList(price);
+        // Giá trị mặc định nếu không truyền: size (0 -> Integer.MAX), price (0 -> MAX)
+        int minSize = (sizeRange != null && sizeRange.size() >= 1) ? sizeRange.get(0) : 0;
+        int maxSize = (sizeRange != null && sizeRange.size() >= 2) ? sizeRange.get(1) : Integer.MAX_VALUE;
+
+        int minPrice = (priceRange != null && priceRange.size() >= 1) ? priceRange.get(0) : 0;
+        int maxPrice = (priceRange != null && priceRange.size() >= 2) ? priceRange.get(1) : Integer.MAX_VALUE;
+
+        Page<BatDongSan> resultPage = batDongSanService.getPostAll(title, propertyType, listingType, address,
+                                                                    minSize, maxSize, minPrice, maxPrice,
+                                                                    bedroom, bathroom, page, limit);
+        Page<PostResponseDTO> pageDto = resultPage.map(PostResponseDTO::fromEntity);
+        ProductResponseDTO<PostResponseDTO> response = ProductResponseDTO.<PostResponseDTO>builder()
+                .success(true)
+                .properties(pageDto.getContent())
+                .pagination(Pagination.builder()
+                        .limit(limit)
+                        .page(page)
+                        .count(resultPage.getTotalElements())
+                        .totalPages(resultPage.getTotalPages())
+                        .build())
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    private List<Integer> parseIntList(String input) {
+        if (input == null || input.isEmpty()) return Collections.emptyList();
+        input = input.replaceAll("\\[|\\]|\\s", "");
+        return Arrays.stream(input.split(","))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateBatDongSan(@PathVariable("id") Integer id,
+                                              @RequestBody CreatePostRequest request) {
+
+        boolean success = batDongSanService.updateBatDongSan(request, id);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Cập nhật tin đăng thành công." : "Cập nhật tin không thành công."));
+    }
+
+    @DeleteMapping("/remove/")
+    public  ResponseEntity<?> deleteBatDongSan(@RequestParam("postIds") Integer id) {
+        boolean success = batDongSanService.deleteBatDongSan(id);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Xóa tin đăng thành công." : "Xóa tin đăng không thành công."));
+    }
+
+    @GetMapping("/one/{id}")
+    public ResponseEntity<?> getDetailBatDongSan(@PathVariable("id") Integer id) {
+        Optional<BatDongSan> bds = batDongSanService.findBaDongSanId(id);
+        BatDongSanDTO xxx = BatDongSanDTO.fromEntity(bds.get());
+
+        List<VoterDTO> voterDtos = danhGiaService.findRatingByMaBatDongSan(bds.get().getId());
+        List<CommentDTO> commentDTOS = binhLuanService.findCommentByMaBatDongSan(bds.get().getId());
+
+        PostDetailDTO postDetailDTO = PostDetailDTO.builder()
+                .success(true)
+                .postData(xxx)
+                .voters(voterDtos)
+                .comments(commentDTOS)
+                .build();
+        return ResponseEntity.ok(postDetailDTO);
+    }
+    @PostMapping("/rating")
+    public ResponseEntity<?> ratingBatDongSan(@RequestBody RatingDTO req,
+                                              @AuthenticationPrincipal TaiKhoan taiKhoanExiting) {
+
+        boolean success = danhGiaService.handleRating(req, taiKhoanExiting);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Đánh giá tin đăng thành công, cảm ơn bạn!" :
+                                                                    "Đánh giá thất bại, vui lòng thử lại."));
+    }
+
+    @PostMapping("/comment-new")
+    public ResponseEntity<?> commentBatDongSan(@RequestBody CommentReqDTO req,
+                                               @AuthenticationPrincipal TaiKhoan currentUser) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        TaiKhoan currentUser = (TaiKhoan) authentication.getPrincipal();
+
+        boolean success = batDongSanService.createNewComment(currentUser.getId(), req);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Bình luận thành công." : "Có lỗi, hãy thử lại."));
+    }
+
 }

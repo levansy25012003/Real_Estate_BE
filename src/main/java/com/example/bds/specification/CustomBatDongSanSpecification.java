@@ -41,6 +41,35 @@ public class CustomBatDongSanSpecification implements Specification<BatDongSan> 
             return criteriaBuilder.equal(taiKhoanJoin.get("id"), value);
         }
 
+        if (field.equalsIgnoreCase("listingType")) {
+            return criteriaBuilder.equal(root.get("loaiDanhSach"), value.toString());
+        }
+
+        if (field.equalsIgnoreCase("address")) {
+            return criteriaBuilder.equal(root.get("diaChi"), value.toString());
+        }
+
+        if (field.equalsIgnoreCase("bedroom")) {
+            return criteriaBuilder.equal(root.get("soPhongNgu"), Integer.parseInt(value.toString()));
+        }
+        if (field.equalsIgnoreCase("bathroom")) {
+            return criteriaBuilder.equal(root.get("soPhongTam"), Integer.parseInt(value.toString()));
+        }
+        if (field.equalsIgnoreCase("minPrice")) {
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("gia"), Integer.parseInt(value.toString()));
+        }
+
+        if (field.equalsIgnoreCase("maxPrice")) {
+            return criteriaBuilder.lessThanOrEqualTo(root.get("gia"), Integer.parseInt(value.toString()));
+        }
+
+        if (field.equalsIgnoreCase("minSize")) {
+            return criteriaBuilder.greaterThanOrEqualTo(root.get("dienTich"), Integer.parseInt(value.toString()));
+        }
+
+        if (field.equalsIgnoreCase("maxSize")) {
+            return criteriaBuilder.lessThanOrEqualTo(root.get("dienTich"), Integer.parseInt(value.toString()));
+        }
 
         return null;
     }

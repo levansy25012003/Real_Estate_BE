@@ -4,12 +4,14 @@ import com.example.bds.dto.rep.ApiResponse;
 import com.example.bds.dto.rep.TaiKhoanResponse;
 import com.example.bds.dto.req.SendOtpRequest;
 import com.example.bds.dto.req.VerifyOtpRequest;
+import com.example.bds.dto.req.WishlistReqDto;
 import com.example.bds.exception.DataNotFoundException;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.TaiKhoanRepository;
 import com.example.bds.service.impl.TaiKhoanService;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -103,5 +105,19 @@ public class TaiKhoanController {
         taiKhoanRepository.save(currentUser);
 
         return ResponseEntity.ok(new ApiResponse(true, "Nâng cấp thành công, bạn hãy đăng nhập lại để cập nhật nhé"));
+    }
+
+    @GetMapping("/wishlist")
+    public ResponseEntity<?> getWishlist() {
+
+        String a = "aa";
+        return null;
+    }
+
+    @PutMapping("/wishlist")
+    public ResponseEntity<?> addWishlist(@RequestBody WishlistReqDto req) {
+
+        String a = "aa";
+        return null;
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.data.util.Pair;
 
@@ -51,11 +52,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authenticationToken  = new UsernamePasswordAuthenticationToken(
                             userDetails,null, userDetails.getAuthorities());
                     authenticationToken .setDetails((new WebAuthenticationDetailsSource().buildDetails(request)));
-                    System.out.println("Before setting SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
-
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-                    System.out.println("After setting SecurityContext: " + SecurityContextHolder.getContext().getAuthentication());
                 }
 //                filterChain.doFilter(request, response);
             }
@@ -66,15 +63,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isBypassToken(HttpServletRequest request) {
+        AntPathMatcher matcher = new AntPathMatcher();
         final List<Pair<String, String>> byPassTokens = Arrays.asList(
                 Pair.of("/auth/register", "POST"),
                 Pair.of("/auth/login", "POST"),
-                Pair.of("/auth/google", "POST")
-
+                Pair.of("/auth/google", "POST"),
+                Pair.of("/post/public", "GET"),
+                Pair.of("/post/one/*", "GET")
         );
         for (Pair<String, String> byPassToken : byPassTokens) {
-            if(request.getServletPath().contains(byPassToken.getFirst()) &&
-                    request.getMethod().equals(byPassToken.getSecond())) {
+            if(
+                    matcher.match(byPassToken.getFirst(), request.getServletPath()) &&
+                    request.getMethod().equals(byPassToken.getSecond()))
+            {
                 return true;
             }
         }

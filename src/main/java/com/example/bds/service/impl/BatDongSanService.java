@@ -1,8 +1,12 @@
 package com.example.bds.service.impl;
 
+import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
 import com.example.bds.model.BatDongSan;
+import com.example.bds.model.BinhLuan;
+import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.BatDongSanRepository;
+import com.example.bds.repository.BinhLuanRepository;
 import com.example.bds.repository.GoiDichVuRepository;
 import com.example.bds.repository.TaiKhoanRepository;
 import com.example.bds.service.IBatDongSanService;
@@ -16,8 +20,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +34,8 @@ public class BatDongSanService implements IBatDongSanService {
     private final BatDongSanRepository batDongSanRepository;
     private final GoiDichVuRepository goiDichVuRepository;
     private final TaiKhoanRepository taiKhoanRepository;
+
+    private final BinhLuanRepository binhLuanRepository;
 
     @Override
     public Boolean createBatDongSan(CreatePostRequest req, Integer id) {
@@ -47,7 +58,7 @@ public class BatDongSanService implements IBatDongSanService {
           bds.setNgayHetHan(new Timestamp(req.getExpiredDate().getTime()));
 
           bds.setLoaiBatDongSan(req.getPropertyType());
-          //bds.setLoaiDanhSach(BatDongSan.LoaiDanhSach.valueOf(req.getListingType()));
+          bds.setLoaiDanhSach(BatDongSan.LoaiDanhSach.valueOf(req.getListingType()));
 
           if (req.getDirection() != null) {
               bds.setHuong(BatDongSan.Huong.valueOf(req.getDirection()));
@@ -97,12 +108,119 @@ public class BatDongSanService implements IBatDongSanService {
     }
 
     @Override
-    public Page<BatDongSan> getProductByOwn(String title, String propertyType, String status, int page, int limit, String sort, String order, Integer id) {
+    public Page<BatDongSan> getProductByOwn(String title, String propertyType, String status, Integer id, int page, int limit, String sort, String order) {
         Sort.Direction direction = order.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(Math.max(page - 1, 0), limit, Sort.by(direction, sort));
-        Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(title, propertyType, status, id);
+
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("title", title);
+        filters.put("propertyType", propertyType);
+        filters.put("status", status);
+        filters.put("id", id);
+
+        Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(filters);
         Page<BatDongSan> batDongSans = batDongSanRepository.findAll(where, pageable);
 
         return batDongSans;
+    }
+
+    @Override
+    public Page<BatDongSan> getPostAll(String title, String propertyType, String listingType, String address,
+                                       Integer minPrice, Integer maxPrice, Integer minSize, Integer maxSize,
+                                       Integer bedroom, Integer bathroom, int page, int limit) {
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), limit);
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("title", title);
+        filters.put("propertyType", propertyType);
+        filters.put("listingType", listingType);
+        filters.put("address", address);
+        filters.put("minPrice", minPrice);
+        filters.put("maxPrice", maxPrice);
+        filters.put("minSize", minSize);
+        filters.put("maxSize", maxSize);
+        filters.put("bedroom", bedroom);
+        filters.put("bathroom", bathroom);
+        Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(filters);
+
+        Page<BatDongSan> batDongSans = batDongSanRepository.findAll(where, pageable);
+        return batDongSans;
+    }
+
+    @Override
+    public Optional<BatDongSan> findBaDongSanId(Integer id) {
+        Optional<BatDongSan> bds = batDongSanRepository.findById(id);
+        return bds;
+    }
+
+    @Override
+    public Boolean updateBatDongSan(CreatePostRequest req, Integer id) {
+        Optional<BatDongSan> bdsOpt = findBaDongSanId(id);
+        BatDongSan bds =  bdsOpt.get();
+        try {
+            bds.setTieuDe(req.getTitle());
+            bds.setMoTa(req.getDescription());
+            bds.setDiaChi(req.getAddress());
+            bds.setTinh(req.getProvince());
+            bds.setHuyen(req.getDistrict());
+            bds.setXa(req.getWard());
+            bds.setGia(req.getPrice());
+            bds.setDongGia(req.getPriceUnit());
+            bds.setDienTich(req.getSize());
+            bds.setSoTang(req.getFloor());
+            bds.setSoPhongNgu(req.getBedroom());
+            bds.setSoPhongTam(req.getBathroom());
+            bds.setNoiThat(req.getIsFurniture());
+
+
+            bds.setLoaiBatDongSan(req.getPropertyType());
+            bds.setLoaiDanhSach(BatDongSan.LoaiDanhSach.valueOf(req.getListingType()));
+
+            if (req.getDirection() != null) {
+                bds.setHuong(BatDongSan.Huong.valueOf(req.getDirection()));
+            }
+            if (req.getBalonyDirection() != null) {
+                bds.setHuongBanCong(BatDongSan.Huong.valueOf(req.getBalonyDirection()));
+            }
+
+            batDongSanRepository.save(bds);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    @Override
+    public Boolean deleteBatDongSan(Integer id) {
+        Optional<BatDongSan> bds = findBaDongSanId(id);
+        if (bds.isPresent()) {
+            batDongSanRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional
+    public Boolean createNewComment(Integer idTaiKhoan, CommentReqDTO req) {
+
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findById(idTaiKhoan);
+        Optional<BatDongSan> bdsOpt = batDongSanRepository.findById(Integer.parseInt(req.getIdProperty()));
+
+        if (taiKhoanOpt.isPresent() && bdsOpt.isPresent()) {
+            BinhLuan bl = new BinhLuan();
+            bl.setNoiDung(req.getContent());
+            bl.setTaiKhoan(taiKhoanOpt.get());
+            bl.setBatDongSan(bdsOpt.get());
+            bl.setNgayTao(LocalDateTime.now());
+            bl.setNgayCapNhat(LocalDateTime.now());
+            binhLuanRepository.save(bl);
+
+            // Cộng điểm
+            taiKhoanRepository.incrementScoreById(10, idTaiKhoan);
+            return true;
+        }
+        return false;
     }
 }

@@ -213,3 +213,6 @@ select * from taikhoan;
 UPDATE taikhoan SET dienThoai = :phone, dienThoaiXacThuc = true WHERE maTaiKhoan = :id;
 
 select * from BATDONGSAN;
+
+select * from BINHLUAN;
+select * from DANHGIA;

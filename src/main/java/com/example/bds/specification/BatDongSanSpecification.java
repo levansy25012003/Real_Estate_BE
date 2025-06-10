@@ -3,29 +3,28 @@ package com.example.bds.specification;
 import com.example.bds.model.BatDongSan;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Map;
+
 @SuppressWarnings("deprecation")
 public class BatDongSanSpecification {
 
-    public static Specification<BatDongSan> buildWhere(String title, String propertyType, String status, Integer id) {
+    public static Specification<BatDongSan> buildWhere(Map<String, Object> filters) {
         Specification<BatDongSan> where = null;
-        if (title != null) {
-            CustomBatDongSanSpecification titleSpec = new CustomBatDongSanSpecification("title", title);
-            where = Specification.where(titleSpec);
-        }
 
-        if (propertyType != null) {
-            CustomBatDongSanSpecification propertyTypeSpec = new CustomBatDongSanSpecification("propertyType", propertyType);
-            where = Specification.where(propertyTypeSpec);
-        }
+        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+            String field = entry.getKey();
+            Object value = entry.getValue();
 
-        if (status != null) {
-            CustomBatDongSanSpecification statusSpec = new CustomBatDongSanSpecification("status", status);
-            where = Specification.where(statusSpec);
-        }
-        if (id != null) {
-            CustomBatDongSanSpecification idSpec = new CustomBatDongSanSpecification("id", id);
-            where = Specification.where(idSpec);
+            if (value != null) {
+                CustomBatDongSanSpecification spec = new CustomBatDongSanSpecification(field, value);
+                if (where == null) {
+                    where = Specification.where(spec);
+                } else {
+                    where = where.and(spec);
+                }
+            }
         }
         return where;
     }
+
 }

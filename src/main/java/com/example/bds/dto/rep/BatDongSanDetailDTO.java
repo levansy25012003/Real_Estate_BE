@@ -1,8 +1,6 @@
 package com.example.bds.dto.rep;
 
-
 import com.example.bds.model.BatDongSan;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
@@ -16,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class BatDongSanDTO {
+public class BatDongSanDetailDTO {
     private List<String> media;
     private List<String> tags;
     private int id;
@@ -48,11 +46,8 @@ public class BatDongSanDTO {
     private String status;
     private Date createdAt;
     private Date updatedAt;
-
-    @JsonProperty("rUser")
-    private UserDTO rUser;
-    public static BatDongSanDTO fromEntity(BatDongSan entity) {
-        return BatDongSanDTO.builder()
+    public static BatDongSanDetailDTO fromEntity(BatDongSan entity) {
+        return BatDongSanDetailDTO.builder()
                 .id(entity.getId())
                 .title(entity.getTieuDe())
                 .address(entity.getDiaChi())
@@ -88,7 +83,6 @@ public class BatDongSanDTO {
                 // Ví dụ giả định hinhAnh lưu media dạng JSON String, còn the lưu tags dạng JSON String
                 .media(parseJsonArrayString(entity.getHinhAnh()))
                 .tags(parseJsonArrayString(entity.getThe()))
-                .rUser(UserDTO.fromEntity(entity.getTaiKhoan()))
                 .build();
     }
 
