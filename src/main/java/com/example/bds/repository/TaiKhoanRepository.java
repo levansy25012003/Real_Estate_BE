@@ -1,6 +1,8 @@
 package com.example.bds.repository;
 
 import com.example.bds.model.TaiKhoan;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -38,4 +40,12 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Integer> {
     @Modifying
     @Query("UPDATE TaiKhoan t SET t.diemTichLuy = t.diemTichLuy + :points WHERE t.id = :id")
     void incrementScoreById(@Param("points") int points, @Param("id") int id);
+
+    Page<TaiKhoan> findByHoVaTenContainingIgnoreCase(String fullname, Pageable pageable);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE TaiKhoan t SET t.vaiTro = :role WHERE t.id = :id")
+    int updateRoleById(@Param("id") int id,
+                       @Param("role") TaiKhoan.VaiTro role);
 }

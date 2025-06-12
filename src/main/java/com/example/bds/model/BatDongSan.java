@@ -77,9 +77,8 @@ public class BatDongSan {
     @Column(name = "huong", columnDefinition = "ENUM('Đông', 'Tây', 'Nam', 'Bắc')")
     private Huong huong;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "trangThai", columnDefinition = "ENUM('Đang mở', 'Đang cập nhật', 'Đã bàn giao')")
-    private TrangThai trangThai;
+    @Column(name = "trangThai")
+    private String trangThai;
 
     @Column(name = "noiThat")
     private Boolean noiThat = false;
@@ -130,10 +129,6 @@ public class BatDongSan {
 
     public enum Huong {
         Đông, Tây, Nam, Bắc
-    }
-
-    public enum TrangThai {
-        Đang_mở, Đang_cập_nhật, Đã_bàn_giao
     }
 
 }

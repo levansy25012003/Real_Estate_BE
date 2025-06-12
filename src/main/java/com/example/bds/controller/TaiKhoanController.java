@@ -1,5 +1,6 @@
 package com.example.bds.controller;
 
+import com.example.bds.dto.admin.TaiKhoanResponseAdminDTO;
 import com.example.bds.dto.rep.ApiResponse;
 import com.example.bds.dto.rep.TaiKhoanResponse;
 import com.example.bds.dto.rep.WishlistRepDto;
@@ -126,5 +127,40 @@ public class TaiKhoanController {
                                          @AuthenticationPrincipal TaiKhoan taiKhoan) {
         String message = danhSachYeuThichService.toggleWishlist(req.getIdProperty(), taiKhoan.getId());
         return ResponseEntity.ok(new ApiResponse(true, message));
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<?>  getUserAdmin(@RequestParam(defaultValue = "5") int limit,
+                                           @RequestParam(defaultValue = "1") int page,
+                                           @RequestParam(defaultValue = "createdAt") String sort,
+                                           @RequestParam(defaultValue = "DESC") String order,
+                                           @RequestParam(required = false) String fullname) {
+        TaiKhoanResponseAdminDTO taiKhoanResponses = taiKhoanService.getAllTaiKhoanByAdmin(limit, page, sort, order, fullname);
+        return ResponseEntity.ok(taiKhoanResponses);
+    }
+
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<?> updateRoleTaiKhoan(@RequestBody Map<String, String> req,
+                                                @PathVariable("id") Integer id) {
+        boolean success = taiKhoanService.updateRoleTaiKhoanByAdmin(id, req.get("role"));
+        return ResponseEntity.ok().body(new ApiResponse(success, success ?  "Cập nhật vai trò thành viên thành công.":
+                                                                            "Cập nhật vai trò thành viên không thành công."));
+    }
+
+    @DeleteMapping("/admin")
+    public ResponseEntity<?> deleteTaiKhoan(@RequestParam("idUsers") Integer id) {
+        String a = "aa";
+        boolean success = taiKhoanService.deleteTaiKhoanByAdmin(id);
+        return ResponseEntity.ok().body(new ApiResponse(success, success ? "Xóa thành viên thành công." :
+                                                                            "Xóa thành viên không thành công."));
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<?> getDashboard(@RequestParam(value = "days", required = false) String days,
+                                          @RequestParam(value = "type", required = false) String type,
+                                          @RequestParam(value = "from", required = false) String from,
+                                          @RequestParam(value = "to", required = false) String to) {
+        String a = "aa";
+        return null;
     }
 }

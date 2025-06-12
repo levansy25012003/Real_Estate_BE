@@ -1,5 +1,7 @@
 package com.example.bds.service;
 
+import com.example.bds.dto.admin.BatDongSanResponseAdminDTO;
+import com.example.bds.dto.admin.StatusRequestDTO;
 import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
 import com.example.bds.model.BatDongSan;
@@ -22,4 +24,7 @@ public interface IBatDongSanService {
     public Boolean updateBatDongSan(CreatePostRequest req, Integer id);
     public Boolean deleteBatDongSan(Integer id);
     public Boolean createNewComment(Integer idTaiKhoan, CommentReqDTO req);
+    public BatDongSanResponseAdminDTO getBatDongSanByAdmin(int limit, int page, String sort, String order, String status, Boolean isPublic);
+    public boolean updateStatusAndPublicBatDongSan(StatusRequestDTO req, Integer id);
+    public void increaseView(Integer id);
 }

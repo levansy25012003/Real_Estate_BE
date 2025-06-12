@@ -76,7 +76,7 @@ public class BatDongSanDetailDTO {
                 .expiredDate(entity.getNgayHetHan() == null ? null : new Date(entity.getNgayHetHan().getTime()))
                 .expiredBoost(entity.getThoiGianHetHieuLucDayTin() == null ? null : new Date(entity.getThoiGianHetHieuLucDayTin().getTime()))
                 .verified(entity.getXacThuc() == null ? false : entity.getXacThuc())
-                .status(entity.getTrangThai() == null ? null : entity.getTrangThai().name().replace('_', ' '))
+                .status(entity.getTrangThai() == null ? null : entity.getTrangThai())
                 .createdAt(entity.getCreatedAt() == null ? null : new Date(entity.getCreatedAt().getTime()))
                 .updatedAt(entity.getUpdatedAt() == null ? null : new Date(entity.getUpdatedAt().getTime()))
                 // Bạn cần xử lý 2 trường media và tags (nếu lưu kiểu String JSON, hoặc tách ra)

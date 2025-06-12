@@ -85,6 +85,8 @@ CREATE TABLE BATDONGSAN (
 );
 ALTER TABLE BATDONGSAN
     MODIFY COLUMN loaiBatDongSan VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE BATDONGSAN
+    MODIFY COLUMN trangThai VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE DANHSACHYEUTHICH (
   maDsYeuThich INT AUTO_INCREMENT PRIMARY KEY,
@@ -212,8 +214,13 @@ select * from taikhoan;
 
 UPDATE taikhoan SET dienThoai = :phone, dienThoaiXacThuc = true WHERE maTaiKhoan = :id;
 
-select * from BATDONGSAN;
+select * from BATDONGSAN ;
 
 select * from BINHLUAN;
 select * from DANHGIA;
 select * from DANHSACHYEUTHICH;
+select * from TAIKHOAN;
+SELECT * FROM batdongsan ORDER BY updatedAt DESC LIMIT 9;
+SELECT COUNT(*) FROM batdongsan WHERE updatedAt IS NULL;
+UPDATE TaiKhoan t SET t.vaiTro = :role WHERE t.maTaiKhoan = :id;
+

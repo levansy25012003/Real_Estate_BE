@@ -1,5 +1,6 @@
 package com.example.bds.service;
 
+import com.example.bds.dto.admin.TaiKhoanResponseAdminDTO;
 import com.example.bds.exception.DataNotFoundException;
 import com.example.bds.model.TaiKhoan;
 
@@ -12,4 +13,8 @@ public interface ITaiKhoanService {
     Optional<TaiKhoan> finByPhoneNumber(String phoneNumber) throws DataNotFoundException;
 
     int updatePhoneAndVerified(Integer id, String phone);
+
+    public TaiKhoanResponseAdminDTO getAllTaiKhoanByAdmin(int limit, int page, String sort, String order, String fullname);
+
+    public boolean updateRoleTaiKhoanByAdmin(Integer id, String role);
 }

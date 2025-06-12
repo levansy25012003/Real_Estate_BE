@@ -24,7 +24,7 @@ public class BatDongSanSpecification {
                 }
             }
         }
-        return where;
+        return where != null ? where : Specification.where(null);
     }
 
 }

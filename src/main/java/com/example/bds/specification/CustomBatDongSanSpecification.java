@@ -70,6 +70,9 @@ public class CustomBatDongSanSpecification implements Specification<BatDongSan> 
         if (field.equalsIgnoreCase("maxSize")) {
             return criteriaBuilder.lessThanOrEqualTo(root.get("dienTich"), Integer.parseInt(value.toString()));
         }
+        if (field.equalsIgnoreCase("isPublic")) {
+            return criteriaBuilder.equal(root.get("congKhai"), value);
+        }
 
         return null;
     }

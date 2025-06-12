@@ -1,5 +1,9 @@
 package com.example.bds.service.impl;
 
+import com.example.bds.dto.admin.BatDongSanDTO;
+import com.example.bds.dto.admin.BatDongSanResponseAdminDTO;
+import com.example.bds.dto.admin.StatusRequestDTO;
+import com.example.bds.dto.rep.Pagination;
 import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
 import com.example.bds.model.BatDongSan;
@@ -24,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -223,4 +225,55 @@ public class BatDongSanService implements IBatDongSanService {
         }
         return false;
     }
+
+    @Override
+    public BatDongSanResponseAdminDTO getBatDongSanByAdmin(int limit, int page, String sort, String order,
+                                                           String status, Boolean isPublic) {
+        Sort.Direction direction = order.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(direction, "createdAt"));
+
+        Map<String, Object> filters = new HashMap<>();
+        if (status != null && !status.isBlank()) {
+            filters.put("status", status);
+        }
+        if (isPublic != null ) {
+            filters.put("isPublic", isPublic);
+        }
+        Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(filters);
+        Page<BatDongSan> batDongSanPage = batDongSanRepository.findAll(where, pageable);
+
+        List<BatDongSan> batDongSans = batDongSanPage.getContent();
+        List<BatDongSanDTO> batDongSanDTOS = new ArrayList<>();
+        for (BatDongSan item : batDongSans) {
+            BatDongSanDTO batDongSanDTO = BatDongSanDTO.fromEntity(item);
+            batDongSanDTOS.add(batDongSanDTO);
+        }
+        Pagination pagination = Pagination.builder()
+                .limit(limit)
+                .page(page)
+                .count(batDongSanPage.getTotalElements())
+                .totalPages(batDongSanPage.getTotalPages())
+                .build();
+        BatDongSanResponseAdminDTO result = BatDongSanResponseAdminDTO.builder()
+                .success(true)
+                .properties(batDongSanDTOS)
+                .pagination(pagination)
+                .build();
+        return result;
+    }
+
+    @Override
+    public boolean updateStatusAndPublicBatDongSan(StatusRequestDTO req, Integer id) {
+        if (batDongSanRepository.findById(id).isPresent()) {
+            batDongSanRepository.updateStatusAndPublic(req.getStatus(), req.getIsPublic(), id);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void increaseView(Integer id) {
+        batDongSanRepository.increaseLuotXem(id);
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.example.bds.controller;
 
+import com.example.bds.dto.admin.BatDongSanResponseAdminDTO;
+import com.example.bds.dto.admin.StatusRequestDTO;
 import com.example.bds.dto.rep.*;
 import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
@@ -134,6 +136,11 @@ public class BatDongSanController {
         Optional<BatDongSan> bds = batDongSanService.findBaDongSanId(id);
         BatDongSanDTO xxx = BatDongSanDTO.fromEntity(bds.get());
 
+        if (bds.isPresent()) {
+            // Tăng view cho bds
+            batDongSanService.increaseView(bds.get().getId());
+        }
+
         List<VoterDTO> voterDtos = danhGiaService.findRatingByMaBatDongSan(bds.get().getId());
         List<CommentDTO> commentDTOS = binhLuanService.findCommentByMaBatDongSan(bds.get().getId());
 
@@ -162,6 +169,37 @@ public class BatDongSanController {
 
         boolean success = batDongSanService.createNewComment(currentUser.getId(), req);
         return ResponseEntity.ok(new ApiResponse(success, success ? "Bình luận thành công." : "Có lỗi, hãy thử lại."));
+    }
+
+    @GetMapping("/admin/posts")
+    public ResponseEntity<?> getBatDongSanByAdmin(@RequestParam(defaultValue = "5", required = false) int limit,
+                                                  @RequestParam(defaultValue = "1", required = false) int page,
+                                                  @RequestParam(defaultValue = "createdAt", required = false) String sort,
+                                                  @RequestParam(defaultValue = "DESC", required = false) String order,
+                                                  @RequestParam(required = false) String status,
+                                                  @RequestParam(required = false) Boolean isPublic) {
+
+        BatDongSanResponseAdminDTO result = batDongSanService.getBatDongSanByAdmin(limit, page, sort, order, status, isPublic);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/update-status/{id}")
+    public ResponseEntity<?> updateStatusAndPublicBatDongSan(@PathVariable("id") Integer id,
+                                                             @RequestBody StatusRequestDTO req) {
+
+        boolean success = batDongSanService.updateStatusAndPublicBatDongSan(req, id);
+        // Gửi mail
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Cập nhật trạng thái tin đăng thành công" :
+                                                                    "Có lỗi hãy thử lại sau."));
+    }
+
+    @DeleteMapping("/remove-by-admin/{id}")
+    public ResponseEntity<?> deleteBatDongSanByAdmin(@PathVariable("id") Integer id) {
+
+        String a = "aa";
+        boolean success = batDongSanService.deleteBatDongSan(id);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Xóa tin đăng thành công." :
+                                                                    "Xóa tin đăng không thành công."));
     }
 
 }
