@@ -17,4 +17,5 @@ public interface ITaiKhoanService {
     public TaiKhoanResponseAdminDTO getAllTaiKhoanByAdmin(int limit, int page, String sort, String order, String fullname);
 
     public boolean updateRoleTaiKhoanByAdmin(Integer id, String role);
+    public boolean buyGoiDichVu(TaiKhoan taiKhoan, Integer maGoiDichVu, Integer total);
 }

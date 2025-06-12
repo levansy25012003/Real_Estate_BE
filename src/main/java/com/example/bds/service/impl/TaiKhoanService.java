@@ -10,7 +10,9 @@ import com.example.bds.dto.req.GoiDichVuDto;
 import com.example.bds.exception.DataNotFoundException;
 import com.example.bds.model.GoiDichVu;
 import com.example.bds.model.TaiKhoan;
+import com.example.bds.repository.GoiDichVuRepository;
 import com.example.bds.repository.TaiKhoanRepository;
+import com.example.bds.service.IDonHangService;
 import com.example.bds.service.ITaiKhoanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +39,8 @@ public class TaiKhoanService implements ITaiKhoanService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final GoiDichVuRepository goiDichVuRepository;
+    private final IDonHangService donHangService;
 
     @Override
     public String login(String email, String password) throws Exception {
@@ -176,5 +180,21 @@ public class TaiKhoanService implements ITaiKhoanService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean buyGoiDichVu(TaiKhoan taiKhoan, Integer maGoiDichVu, Integer total) {
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findById(taiKhoan.getId());
+        Optional<GoiDichVu> goiDichVu = goiDichVuRepository.findById(maGoiDichVu);
+
+        if (!taiKhoanOpt.isPresent()) {
+            return false;
+        }
+        TaiKhoan taiKhoanExiting = taiKhoanOpt.get();
+        taiKhoanExiting.setMaGiaHienTai(goiDichVu.get());
+        taiKhoanExiting.setSoDu(taiKhoanExiting.getSoDu() - total);
+        taiKhoanRepository.save(taiKhoanExiting);
+
+        return donHangService.createDonHang(taiKhoan, maGoiDichVu, total);
     }
 }

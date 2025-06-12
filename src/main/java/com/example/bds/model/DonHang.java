@@ -9,6 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DonHang {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +30,9 @@ public class DonHang {
     @Column(name = "maHoaDon")
     private String maHoaDon;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "trangThai")
-    private TrangThai trangThai;
+    private String trangThai;
 
-    public enum TrangThai {
-        Thanh_cong, Dang_cho, That_bai
-    }
+
 
 }

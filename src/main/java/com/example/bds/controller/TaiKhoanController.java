@@ -179,4 +179,14 @@ public class TaiKhoanController {
                 "msg", new Pagination(5, 1, 2, 1)
         ));
     }
+    @PutMapping("/buy-pricing")
+    public ResponseEntity<?> buyPricings(@RequestBody Map<String, Integer> req,
+                                         @AuthenticationPrincipal TaiKhoan taiKhoan) {
+        String a = "aa";
+        Integer idPricing = req.get("idPricing");
+        Integer total = req.get("total");
+        boolean success = taiKhoanService.buyGoiDichVu(taiKhoan, idPricing, total);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Nâng cấp thành công" :
+                                                                    "Nâng cấp không thành công."));
+    }
 }

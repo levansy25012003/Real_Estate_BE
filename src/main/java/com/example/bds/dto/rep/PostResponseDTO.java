@@ -1,6 +1,7 @@
 package com.example.bds.dto.rep;
 
 import com.example.bds.model.BatDongSan;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
@@ -46,7 +47,11 @@ public class PostResponseDTO {
     private String status;
     private Date createdAt;
     private Date updatedAt;
+
+    @JsonProperty("rPricing")
     private PricingDTO rPricing;
+
+    @JsonProperty("rUser")
     private UserDTO rUser;
 
     public static PostResponseDTO  fromEntity(BatDongSan entity) {

@@ -172,6 +172,9 @@ CREATE TABLE DONHANG (
      FOREIGN KEY (maGoiDichVu) REFERENCES GOIDICHVU(maGoiDichVu),
      FOREIGN KEY (maTaiKhoan) REFERENCES TAIKHOAN(maTaiKhoan)
 );
+ALTER TABLE DONHANG
+    MODIFY COLUMN trangThai VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 select * from BATDONGSAN;
 SHOW COLUMNS FROM BATDONGSAN;
 INSERT INTO TAIKHOAN (
@@ -227,3 +230,6 @@ SELECT COUNT(*) FROM batdongsan WHERE updatedAt IS NULL;
 UPDATE TaiKhoan t SET t.vaiTro = :role WHERE t.maTaiKhoan = :id;
 
 select * from tinthethan;
+select * from DONHANG;
+select * from GOIDICHVU;
+select * from TAIKHOAN;
