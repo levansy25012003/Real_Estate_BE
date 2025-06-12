@@ -22,9 +22,8 @@ public class TinHetHan {
     @Column(name = "soNgay", nullable = false)
     private Integer soNgay;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "trangThai")
-    private TrangThai trangThai;
+    private String trangThai;
 
     @Column(name = "maHoaDon")
     private String maHoaDon;
@@ -43,8 +42,5 @@ public class TinHetHan {
     @Column(name = "ngayCapNhat")
     private LocalDateTime ngayCapNhat;
 
-    public enum TrangThai {
-        Thanh_cong, Dang_cho, That_bai
-    }
 
 }

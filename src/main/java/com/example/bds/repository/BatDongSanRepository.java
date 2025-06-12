@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -26,4 +27,9 @@ public interface BatDongSanRepository extends JpaRepository<BatDongSan,Integer>,
     @Transactional
     @Query("UPDATE BatDongSan b SET b.luotXem = b.luotXem + 1 WHERE b.id = :id")
     void increaseLuotXem(@Param("id") int id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE BatDongSan b SET b.ngayHetHan = :expiredDate WHERE b.id = :id")
+    int updateExpiredDateById(@Param("expiredDate") LocalDateTime expiredDate, @Param("id") int id);
 }

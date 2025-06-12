@@ -1,9 +1,7 @@
 package com.example.bds.controller;
 
 import com.example.bds.dto.admin.TaiKhoanResponseAdminDTO;
-import com.example.bds.dto.rep.ApiResponse;
-import com.example.bds.dto.rep.TaiKhoanResponse;
-import com.example.bds.dto.rep.WishlistRepDto;
+import com.example.bds.dto.rep.*;
 import com.example.bds.dto.req.SendOtpRequest;
 import com.example.bds.dto.req.VerifyOtpRequest;
 import com.example.bds.dto.req.WishlistReqDto;
@@ -12,6 +10,7 @@ import com.example.bds.model.DanhSachYeuThich;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.TaiKhoanRepository;
 import com.example.bds.service.IDanhSachYeuThichService;
+import com.example.bds.service.ITinHetHanService;
 import com.example.bds.service.impl.TaiKhoanService;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
@@ -38,6 +37,7 @@ public class TaiKhoanController {
     private final TaiKhoanService taiKhoanService;
     private final TaiKhoanRepository taiKhoanRepository;
     private final IDanhSachYeuThichService danhSachYeuThichService;
+    private final ITinHetHanService tinHetHanService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
@@ -162,5 +162,21 @@ public class TaiKhoanController {
                                           @RequestParam(value = "to", required = false) String to) {
         String a = "aa";
         return null;
+    }
+
+    @GetMapping("/expired-history")
+    public ResponseEntity<?> getExpiredHistory(@RequestParam(defaultValue = "5") int limit,
+                                               @RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "ngayTao") String sort,
+                                               @RequestParam(defaultValue = "DESC") String order,
+                                               @AuthenticationPrincipal TaiKhoan taiKhoan) {
+        List<ExpiredHistory> expiredHistoryList = tinHetHanService.getExpiredHistory(limit, page, sort, order, taiKhoan);
+
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "payments", expiredHistoryList,
+                "msg", new Pagination(5, 1, 2, 1)
+        ));
     }
 }

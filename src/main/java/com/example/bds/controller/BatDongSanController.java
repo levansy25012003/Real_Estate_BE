@@ -5,12 +5,14 @@ import com.example.bds.dto.admin.StatusRequestDTO;
 import com.example.bds.dto.rep.*;
 import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
+import com.example.bds.dto.req.ExpireDTO;
 import com.example.bds.dto.req.RatingDTO;
 import com.example.bds.model.BatDongSan;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.service.IBatDongSanService;
 import com.example.bds.service.IBinhLuanService;
 import com.example.bds.service.IDanhGiaService;
+import com.example.bds.service.ITinHetHanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +32,7 @@ public class BatDongSanController {
     private final IBatDongSanService batDongSanService;
     private final IDanhGiaService danhGiaService;
     private final IBinhLuanService binhLuanService;
+    private final ITinHetHanService tinHetHanService;
 
     @PostMapping("/new")
     public ResponseEntity<?> createBatDongSan(@RequestBody CreatePostRequest request) {
@@ -200,6 +203,15 @@ public class BatDongSanController {
         boolean success = batDongSanService.deleteBatDongSan(id);
         return ResponseEntity.ok(new ApiResponse(success, success ? "Xóa tin đăng thành công." :
                                                                     "Xóa tin đăng không thành công."));
+    }
+
+    @PostMapping("/expire-post")
+    public ResponseEntity<?> expirePost(@RequestBody ExpireDTO req,
+                                        @AuthenticationPrincipal TaiKhoan taiKhoan) {
+        String a = "aa";
+        boolean success = tinHetHanService.createTinHetHan(req, taiKhoan);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Gia hạn thành công." :
+                                                                    "Gia hạn thất bại."));
     }
 
 }

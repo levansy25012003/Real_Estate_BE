@@ -145,6 +145,8 @@ CREATE TABLE TINTHETHAN (
     FOREIGN KEY (maTaiKhoan) REFERENCES TAIKHOAN(maTaiKhoan),
     FOREIGN KEY (maBatDongSan) REFERENCES BATDONGSAN(maBatDongSan)
 );
+ALTER TABLE TINTHETHAN
+    MODIFY COLUMN trangThai VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE THANHTOAN (
    maThanhToan INT AUTO_INCREMENT PRIMARY KEY,
@@ -224,3 +226,4 @@ SELECT * FROM batdongsan ORDER BY updatedAt DESC LIMIT 9;
 SELECT COUNT(*) FROM batdongsan WHERE updatedAt IS NULL;
 UPDATE TaiKhoan t SET t.vaiTro = :role WHERE t.maTaiKhoan = :id;
 
+select * from tinthethan;

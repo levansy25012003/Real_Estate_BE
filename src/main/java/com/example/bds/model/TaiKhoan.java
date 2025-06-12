@@ -59,6 +59,9 @@ public class TaiKhoan implements UserDetails {
     @OneToMany(mappedBy = "taiKhoan")
     private List<DanhSachYeuThich> danhSachYeuThiches;
 
+    @OneToMany(mappedBy = "taiKhoan")
+    private List<TinHetHan> tinHetHans;
+
     @Column(name = "maDatLaiMatKhau")
     private String maDatLaiMatKhau;
 

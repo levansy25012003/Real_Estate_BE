@@ -1,18 +1,18 @@
 package com.example.bds.service.impl;
 
+import com.example.bds.component.MaHoaDonUtil;
 import com.example.bds.dto.admin.BatDongSanDTO;
 import com.example.bds.dto.admin.BatDongSanResponseAdminDTO;
 import com.example.bds.dto.admin.StatusRequestDTO;
 import com.example.bds.dto.rep.Pagination;
 import com.example.bds.dto.req.CommentReqDTO;
 import com.example.bds.dto.req.CreatePostRequest;
+import com.example.bds.dto.req.ExpireDTO;
 import com.example.bds.model.BatDongSan;
 import com.example.bds.model.BinhLuan;
 import com.example.bds.model.TaiKhoan;
-import com.example.bds.repository.BatDongSanRepository;
-import com.example.bds.repository.BinhLuanRepository;
-import com.example.bds.repository.GoiDichVuRepository;
-import com.example.bds.repository.TaiKhoanRepository;
+import com.example.bds.model.TinHetHan;
+import com.example.bds.repository.*;
 import com.example.bds.service.IBatDongSanService;
 import com.example.bds.specification.BatDongSanSpecification;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -38,6 +38,7 @@ public class BatDongSanService implements IBatDongSanService {
     private final TaiKhoanRepository taiKhoanRepository;
 
     private final BinhLuanRepository binhLuanRepository;
+    private final TinHetHanRepository tinHetHanRepository;
 
     @Override
     public Boolean createBatDongSan(CreatePostRequest req, Integer id) {
@@ -275,5 +276,7 @@ public class BatDongSanService implements IBatDongSanService {
     public void increaseView(Integer id) {
         batDongSanRepository.increaseLuotXem(id);
     }
+
+
 
 }

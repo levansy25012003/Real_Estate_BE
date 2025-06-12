@@ -48,4 +48,10 @@ public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Integer> {
     @Query("UPDATE TaiKhoan t SET t.vaiTro = :role WHERE t.id = :id")
     int updateRoleById(@Param("id") int id,
                        @Param("role") TaiKhoan.VaiTro role);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE TaiKhoan t SET t.soDu = t.soDu - :total WHERE t.id = :id")
+    void decreaseSoDu(@Param("total") int total,
+                      @Param("id") int id);
 }
