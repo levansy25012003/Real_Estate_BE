@@ -70,7 +70,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/auth/login", "POST"),
                 Pair.of("/auth/google", "POST"),
                 Pair.of("/post/public", "GET"),
-                Pair.of("/post/one/*", "GET")
+                Pair.of("/post/one/*", "GET"),
+                Pair.of("/payment/vnpay-return", "GET")
         );
         for (Pair<String, String> byPassToken : byPassTokens) {
             if(

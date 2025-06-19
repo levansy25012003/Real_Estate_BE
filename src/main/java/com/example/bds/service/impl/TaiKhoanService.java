@@ -14,6 +14,7 @@ import com.example.bds.repository.GoiDichVuRepository;
 import com.example.bds.repository.TaiKhoanRepository;
 import com.example.bds.service.IDonHangService;
 import com.example.bds.service.ITaiKhoanService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -196,5 +197,19 @@ public class TaiKhoanService implements ITaiKhoanService {
         taiKhoanRepository.save(taiKhoanExiting);
 
         return donHangService.createDonHang(taiKhoan, maGoiDichVu, total);
+    }
+
+    @Override
+    public boolean increaseSoDuTaiKhoan(Integer id, Integer amount) {
+
+        Optional<TaiKhoan> taiKhoanOpt = taiKhoanRepository.findById(id);
+        if (!taiKhoanOpt.isPresent()) {
+            return false;
+        }
+        TaiKhoan taiKhoan = taiKhoanOpt.get();
+        taiKhoan.setSoDu(taiKhoan.getSoDu() + amount);
+
+        taiKhoanRepository.save(taiKhoan);
+        return true;
     }
 }

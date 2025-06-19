@@ -10,6 +10,7 @@ import com.example.bds.model.DanhSachYeuThich;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.TaiKhoanRepository;
 import com.example.bds.service.IDanhSachYeuThichService;
+import com.example.bds.service.IThanhToanService;
 import com.example.bds.service.ITinHetHanService;
 import com.example.bds.service.impl.TaiKhoanService;
 import com.twilio.rest.verify.v2.service.Verification;
@@ -38,6 +39,7 @@ public class TaiKhoanController {
     private final TaiKhoanRepository taiKhoanRepository;
     private final IDanhSachYeuThichService danhSachYeuThichService;
     private final ITinHetHanService tinHetHanService;
+    private final IThanhToanService thanhToanService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
@@ -188,5 +190,23 @@ public class TaiKhoanController {
         boolean success = taiKhoanService.buyGoiDichVu(taiKhoan, idPricing, total);
         return ResponseEntity.ok(new ApiResponse(success, success ? "Nâng cấp thành công" :
                                                                     "Nâng cấp không thành công."));
+    }
+
+    @GetMapping("/payment-history")
+    public ResponseEntity<?> getPaymentHistory(@RequestParam(defaultValue = "5") int limit,
+                                               @RequestParam(defaultValue = "1") int page,
+                                               @RequestParam(defaultValue = "ngayTao") String sort,
+                                               @RequestParam(defaultValue = "DESC") String order,
+                                               @AuthenticationPrincipal TaiKhoan taiKhoan) {
+        List<ThanhToanRepDTO> thanhToanList = thanhToanService.getLichSuThanhToanThanhToan(limit, page, sort, order, taiKhoan);
+        Pagination pagination = Pagination.builder()
+                .limit(5)
+                .page(1)
+                .count(thanhToanList.size())
+                .totalPages(1)
+                .build();
+        return ResponseEntity.ok(Map.of("success", true,
+                                        "payments", thanhToanList,
+                                        "pagination", pagination ));
     }
 }

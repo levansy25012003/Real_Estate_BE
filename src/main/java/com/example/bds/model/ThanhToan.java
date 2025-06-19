@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Table(name = "thanhtoan")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ThanhToan {
@@ -19,9 +20,8 @@ public class ThanhToan {
     @Column(name = "soTien", nullable = false)
     private Integer soTien;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "trangThai")
-    private TrangThai trangThai;
+    private String trangThai;
 
     @Column(name = "phuongThuc")
     private String phuongThuc;
@@ -42,7 +42,4 @@ public class ThanhToan {
     @JoinColumn(name = "maTaiKhoan", nullable = false)
     private TaiKhoan taiKhoan;
 
-    public enum TrangThai {
-        Thanh_cong, Dang_cho, That_bai
-    }
 }

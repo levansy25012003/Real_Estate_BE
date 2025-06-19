@@ -14,4 +14,13 @@ public class MaHoaDonUtil {
         }
         return sb.toString();
     }
+
+    public static String taoMaHoaDonVNP() {
+        StringBuilder sb = new StringBuilder("VNPAY-"); // prefix HD for "Hóa Đơn"
+        for (int i = 0; i < DEFAULT_LENGTH; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(index));
+        }
+        return sb.toString();
+    }
 }

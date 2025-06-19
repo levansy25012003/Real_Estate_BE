@@ -18,4 +18,5 @@ public interface ITaiKhoanService {
 
     public boolean updateRoleTaiKhoanByAdmin(Integer id, String role);
     public boolean buyGoiDichVu(TaiKhoan taiKhoan, Integer maGoiDichVu, Integer total);
+    public boolean increaseSoDuTaiKhoan(Integer id, Integer amount);
 }

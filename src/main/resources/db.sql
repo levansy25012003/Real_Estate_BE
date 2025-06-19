@@ -162,6 +162,9 @@ CREATE TABLE THANHTOAN (
    FOREIGN KEY (maTaiKhoan) REFERENCES TAIKHOAN(maTaiKhoan)
 );
 
+ALTER TABLE THANHTOAN
+    MODIFY COLUMN trangThai VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE DONHANG (
      maDonHang INT AUTO_INCREMENT PRIMARY KEY,
      maGoiDichVu INT,
@@ -233,3 +236,4 @@ select * from tinthethan;
 select * from DONHANG;
 select * from GOIDICHVU;
 select * from TAIKHOAN;
+select * from THANHTOAN;
