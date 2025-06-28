@@ -15,7 +15,7 @@ public class BatDongSanSpecification {
             String field = entry.getKey();
             Object value = entry.getValue();
 
-            if (value != null) {
+            if (value != null && !(value instanceof String && ((String) value).trim().isEmpty())) {
                 CustomBatDongSanSpecification spec = new CustomBatDongSanSpecification(field, value);
                 if (where == null) {
                     where = Specification.where(spec);

@@ -69,6 +69,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/auth/register", "POST"),
                 Pair.of("/auth/login", "POST"),
                 Pair.of("/auth/google", "POST"),
+                Pair.of("/auth/login-email", "POST"),
+                Pair.of("/auth/login-phone", "POST"),
+                Pair.of("/user/reset-password-required", "POST"),
+                Pair.of("/user/reset-password-verify", "POST"),
                 Pair.of("/post/public", "GET"),
                 Pair.of("/post/one/*", "GET"),
                 Pair.of("/payment/vnpay-return", "GET")

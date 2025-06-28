@@ -18,7 +18,7 @@ public class CreatePostRequest {
     private String district;
     private String ward;
 
-    private Integer price;
+    private Long price;
     private Integer priceUnit;
     private Integer idPricing;
 

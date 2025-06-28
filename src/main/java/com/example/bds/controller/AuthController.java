@@ -1,6 +1,9 @@
 package com.example.bds.controller;
 
+import com.example.bds.dto.rep.AuthResponse;
+import com.example.bds.dto.req.LoginEmailDTO;
 import com.example.bds.dto.req.LoginGoogleDTO;
+import com.example.bds.dto.req.LoginPhoneDTO;
 import com.example.bds.dto.req.LoginRequestDTO;
 import com.example.bds.exception.DataNotFoundException;
 import com.example.bds.service.impl.AuthService;
@@ -56,5 +59,17 @@ public class AuthController {
             ));
         }
     }
+
+    @PostMapping("/login-email")
+    public ResponseEntity<?> loginWithEmail(@RequestBody LoginEmailDTO req) {
+        AuthResponse response = authService.loginWithEmail(req);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/login-phone")
+    public ResponseEntity<?> loginWithPhone(@RequestBody LoginPhoneDTO req) {
+        AuthResponse response = authService.loginWithPhone(req);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

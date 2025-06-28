@@ -61,7 +61,7 @@ public class BatDongSanService implements IBatDongSanService {
           bds.setNgayHetHan(new Timestamp(req.getExpiredDate().getTime()));
 
           bds.setLoaiBatDongSan(req.getPropertyType());
-          bds.setLoaiDanhSach(BatDongSan.LoaiDanhSach.valueOf(req.getListingType()));
+          bds.setLoaiDanhSach(req.getListingType());
 
           if (req.getDirection() != null) {
               bds.setHuong(BatDongSan.Huong.valueOf(req.getDirection()));
@@ -75,7 +75,7 @@ public class BatDongSanService implements IBatDongSanService {
           } else {
               bds.setCongKhai(false);
           }
-
+          bds.setTrangThai("Đang mở");
           if (req.getTags() != null) {
               ObjectMapper mapper = new ObjectMapper();
               String jsonTags = mapper.writeValueAsString(req.getTags());
@@ -120,6 +120,7 @@ public class BatDongSanService implements IBatDongSanService {
         filters.put("propertyType", propertyType);
         filters.put("status", status);
         filters.put("id", id);
+        filters.put("isdraft", false); // ko lấy bản nháp
 
         Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(filters);
         Page<BatDongSan> batDongSans = batDongSanRepository.findAll(where, pageable);
@@ -129,20 +130,38 @@ public class BatDongSanService implements IBatDongSanService {
 
     @Override
     public Page<BatDongSan> getPostAll(String title, String propertyType, String listingType, String address,
-                                       Integer minPrice, Integer maxPrice, Integer minSize, Integer maxSize,
+                                       Integer minSize, Integer maxSize, Long minPrice, Long maxPrice,
                                        Integer bedroom, Integer bathroom, int page, int limit) {
-        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), limit);
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "goiDichVu.id").
+                and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), limit, sort);
+
+        String[] addressParts = address != null ? address.split(",\\s*") : new String[0];
         Map<String, Object> filters = new HashMap<>();
         filters.put("title", title);
-        filters.put("propertyType", propertyType);
-        filters.put("listingType", listingType);
-        filters.put("address", address);
-        filters.put("minPrice", minPrice);
-        filters.put("maxPrice", maxPrice);
-        filters.put("minSize", minSize);
-        filters.put("maxSize", maxSize);
+        filters.put("propertytype", propertyType);
+        filters.put("listingtype", listingType);
+//        filters.put("address", address);
+        // ✅ Thêm điều kiện kiểm tra độ dài mảng trước khi thêm vào filters
+        // ✅ Xử lý theo độ dài của addressParts:
+        if (addressParts.length == 1) {
+            filters.put("province", addressParts[0]);
+        } else if (addressParts.length == 2) {
+            filters.put("district", addressParts[0]);
+            filters.put("province", addressParts[1]);
+        } else if (addressParts.length >= 3) {
+            filters.put("ward", addressParts[0]);
+            filters.put("district", addressParts[1]);
+            filters.put("province", addressParts[2]);
+        }
+        filters.put("minprice", minPrice);
+        filters.put("maxprice", maxPrice);
+        filters.put("minsize", minSize);
+        filters.put("maxsize", maxSize);
         filters.put("bedroom", bedroom);
         filters.put("bathroom", bathroom);
+        filters.put("isverify", true);
         Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(filters);
 
         Page<BatDongSan> batDongSans = batDongSanRepository.findAll(where, pageable);
@@ -176,7 +195,7 @@ public class BatDongSanService implements IBatDongSanService {
 
 
             bds.setLoaiBatDongSan(req.getPropertyType());
-            bds.setLoaiDanhSach(BatDongSan.LoaiDanhSach.valueOf(req.getListingType()));
+            bds.setLoaiDanhSach(req.getListingType());
 
             if (req.getDirection() != null) {
                 bds.setHuong(BatDongSan.Huong.valueOf(req.getDirection()));
@@ -194,6 +213,45 @@ public class BatDongSanService implements IBatDongSanService {
 
     }
 
+    @Override
+    public Boolean updateDraftBatDongSan(CreatePostRequest req, Integer id, Boolean isDraft) {
+        Optional<BatDongSan> bdsOpt = findBaDongSanId(id);
+        BatDongSan bds =  bdsOpt.get();
+        try {
+            bds.setTieuDe(req.getTitle());
+            bds.setMoTa(req.getDescription());
+            bds.setDiaChi(req.getAddress());
+            bds.setTinh(req.getProvince());
+            bds.setHuyen(req.getDistrict());
+            bds.setXa(req.getWard());
+            bds.setGia(req.getPrice());
+            bds.setDongGia(req.getPriceUnit());
+            bds.setDienTich(req.getSize());
+            bds.setSoTang(req.getFloor());
+            bds.setSoPhongNgu(req.getBedroom());
+            bds.setSoPhongTam(req.getBathroom());
+            bds.setNoiThat(req.getIsFurniture());
+
+
+            bds.setLoaiBatDongSan(req.getPropertyType());
+            bds.setLoaiDanhSach(req.getListingType());
+
+            if (req.getDirection() != null) {
+                bds.setHuong(BatDongSan.Huong.valueOf(req.getDirection()));
+            }
+            if (req.getBalonyDirection() != null) {
+                bds.setHuongBanCong(BatDongSan.Huong.valueOf(req.getBalonyDirection()));
+            }
+            bds.setBanNhap(isDraft);
+
+            batDongSanRepository.save(bds);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
     @Override
     public Boolean deleteBatDongSan(Integer id) {
         Optional<BatDongSan> bds = findBaDongSanId(id);
@@ -278,5 +336,98 @@ public class BatDongSanService implements IBatDongSanService {
     }
 
 
+    @Override
+    public Boolean createBatDongSanNhap(CreatePostRequest req, Integer id) {
+        try {
+            BatDongSan bds = new BatDongSan();
+
+            bds.setTieuDe(req.getTitle());
+            bds.setMoTa(req.getDescription());
+            bds.setDiaChi(req.getAddress());
+            bds.setTinh(req.getProvince());
+            bds.setHuyen(req.getDistrict());
+            bds.setXa(req.getWard());
+            bds.setGia(req.getPrice());
+            bds.setDongGia(req.getPriceUnit());
+            bds.setDienTich(req.getSize());
+            bds.setSoTang(req.getFloor());
+            bds.setSoPhongNgu(req.getBedroom());
+            bds.setSoPhongTam(req.getBathroom());
+            bds.setNoiThat(req.getIsFurniture());
+            if (req.getExpiredDate() != null) {
+                bds.setNgayHetHan(new Timestamp(req.getExpiredDate().getTime()));
+            } else {
+                bds.setNgayHetHan(new Timestamp(System.currentTimeMillis()));
+            }
+
+
+            bds.setLoaiBatDongSan(req.getPropertyType());
+            bds.setLoaiDanhSach(req.getListingType());
+
+            if (req.getDirection() != null) {
+                bds.setHuong(BatDongSan.Huong.valueOf(req.getDirection()));
+            }
+            if (req.getBalonyDirection() != null) {
+                bds.setHuongBanCong(BatDongSan.Huong.valueOf(req.getBalonyDirection()));
+            }
+
+            if (req.getIdPricing() != null && req.getIdPricing() != 1) {
+                bds.setCongKhai(true);
+            } else {
+                bds.setCongKhai(false);
+            }
+            bds.setTrangThai("Đang mở");
+            if (req.getTags() != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonTags = mapper.writeValueAsString(req.getTags());
+                bds.setThe(jsonTags);
+            }
+            if (req.getMedia() != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                String jsonMedia = mapper.writeValueAsString(req.getMedia());
+                bds.setHinhAnh(jsonMedia);
+            }
+            bds.setXacThuc(false);
+            bds.setLuotXem(0);
+            // Thiết lập liên kết tài khoản và gói dịch vụ
+            taiKhoanRepository.findById(id).ifPresent(bds::setTaiKhoan);
+            if (req.getIdPricing() != null) {
+                goiDichVuRepository.findById(req.getIdPricing())
+                        .ifPresentOrElse(
+                                bds::setGoiDichVu,
+                                () -> goiDichVuRepository.findById(1)
+                                        .ifPresent(bds::setGoiDichVu)
+                        );
+            } else {
+                goiDichVuRepository.findById(1)
+                        .ifPresent(bds::setGoiDichVu);
+            }
+            bds.setBanNhap(true);
+            batDongSanRepository.save(bds);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    @Override
+    public Page<BatDongSan> getDraftByOwn(String title, String propertyType, String status, Integer id, int page, int limit, String sort, String order) {
+        Sort.Direction direction = order.equalsIgnoreCase("DESC") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(Math.max(page - 1, 0), limit, Sort.by(direction, sort));
+
+        Map<String, Object> filters = new HashMap<>();
+        filters.put("title", title);
+        filters.put("propertyType", propertyType);
+        filters.put("status", status);
+        filters.put("id", id);
+        filters.put("isdraft", true); // ko lấy bản nháp
+
+        Specification<BatDongSan> where = BatDongSanSpecification.buildWhere(filters);
+        Page<BatDongSan> batDongSans = batDongSanRepository.findAll(where, pageable);
+
+        return batDongSans;
+    }
 
 }

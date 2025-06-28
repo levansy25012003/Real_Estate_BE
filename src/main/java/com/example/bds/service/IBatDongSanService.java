@@ -19,7 +19,7 @@ public interface IBatDongSanService {
                                             int limit, String sort, String order);
 
     public Page<BatDongSan> getPostAll(String title, String propertyType, String listingType, String address,
-                                       Integer minPrice, Integer maxPrice, Integer minSize, Integer maxSize,
+                                       Integer minSize, Integer maxSize, Long minPrice, Long maxPrice,
                                        Integer bedroom, Integer bathroom, int page, int limit);
 
     public Optional<BatDongSan> findBaDongSanId(Integer id);
@@ -29,4 +29,11 @@ public interface IBatDongSanService {
     public BatDongSanResponseAdminDTO getBatDongSanByAdmin(int limit, int page, String sort, String order, String status, Boolean isPublic);
     public boolean updateStatusAndPublicBatDongSan(StatusRequestDTO req, Integer id);
     public void increaseView(Integer id);
+
+    Boolean createBatDongSanNhap(CreatePostRequest request, Integer id);
+
+    public Page<BatDongSan> getDraftByOwn(String title, String propertyType, String status, Integer id, int page,
+                                            int limit, String sort, String order);
+
+    public Boolean updateDraftBatDongSan(CreatePostRequest req, Integer id, Boolean isDraft);
 }

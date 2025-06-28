@@ -2,13 +2,12 @@ package com.example.bds.controller;
 
 import com.example.bds.dto.admin.TaiKhoanResponseAdminDTO;
 import com.example.bds.dto.rep.*;
-import com.example.bds.dto.req.SendOtpRequest;
-import com.example.bds.dto.req.VerifyOtpRequest;
-import com.example.bds.dto.req.WishlistReqDto;
+import com.example.bds.dto.req.*;
 import com.example.bds.exception.DataNotFoundException;
 import com.example.bds.model.DanhSachYeuThich;
 import com.example.bds.model.TaiKhoan;
 import com.example.bds.repository.TaiKhoanRepository;
+import com.example.bds.service.IAuthService;
 import com.example.bds.service.IDanhSachYeuThichService;
 import com.example.bds.service.IThanhToanService;
 import com.example.bds.service.ITinHetHanService;
@@ -40,6 +39,7 @@ public class TaiKhoanController {
     private final IDanhSachYeuThichService danhSachYeuThichService;
     private final ITinHetHanService tinHetHanService;
     private final IThanhToanService thanhToanService;
+    private final IAuthService authService;
 
     @GetMapping("/me")
     public ResponseEntity<?> getMe() {
@@ -208,5 +208,56 @@ public class TaiKhoanController {
         return ResponseEntity.ok(Map.of("success", true,
                                         "payments", thanhToanList,
                                         "pagination", pagination ));
+    }
+
+    @PostMapping("/reset-password-required")
+    public ResponseEntity<?> resetPasswordRequired(@RequestBody ResetPasswordDTO req) {
+        return ResponseEntity.ok(authService.resetPasswordRequired(req));
+    }
+
+    @PostMapping("/reset-password-verify")
+    public ResponseEntity<?> resetPasswordVerify(@RequestBody ResetPassVerifyDTO req) {
+
+        if (req.getEmail() != null) {
+            ApiResponse apiResponse = authService.resetByEmail(
+                    req.getEmail(),
+                    req.getOtp(),
+                    req.getPassword()
+            );
+            return ResponseEntity.ok(apiResponse);
+        } else if (req.getPhone() != null) {
+            ApiResponse apiResponse = authService.resetByPhone(
+                    req.getPhone(),
+                    req.getOtp(),
+                    req.getPassword()
+            );
+            return ResponseEntity.ok(apiResponse);
+        }
+        return null;
+    }
+
+    @PostMapping("/send-mail")
+    public ResponseEntity<?> sendOtpEmail(@RequestBody ResetPasswordDTO req) {
+        return ResponseEntity.ok(authService.resetPasswordRequired(req));
+    }
+
+    @PostMapping("/verify-mail")
+    public ResponseEntity<?> verifyEmail(@RequestBody ResetPassVerifyDTO req) {
+
+        if (req.getEmail() != null) {
+            ApiResponse apiResponse = authService.verifyByEmail(
+                    req.getEmail(),
+                    req.getOtp()
+            );
+            return ResponseEntity.ok(apiResponse);
+        } else if (req.getPhone() != null) {
+            ApiResponse apiResponse = authService.resetByPhone(
+                    req.getPhone(),
+                    req.getOtp(),
+                    req.getPassword()
+            );
+            return ResponseEntity.ok(apiResponse);
+        }
+        return null;
     }
 }

@@ -36,7 +36,7 @@ public class BatDongSan {
     private String tinh;
 
     @Column(name = "gia")
-    private Integer gia = 0;
+    private Long gia = 0L;
 
     @Column(name = "dongGia")
     private Integer dongGia = 0;
@@ -59,9 +59,8 @@ public class BatDongSan {
     @Column(name = "loaiBatDongSan")
     private String loaiBatDongSan;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "loaiDanhSach", columnDefinition = "ENUM('Bán', 'Cho thuê')")
-    private LoaiDanhSach loaiDanhSach;
+    @Column(name = "loaiDanhSach")
+    private String loaiDanhSach;
 
     @Column(name = "diemDanhGiaTB")
     private Float diemDanhGiaTB;
@@ -107,6 +106,9 @@ public class BatDongSan {
     @Column(name = "updatedAt", insertable = false)
     private Timestamp updatedAt;
 
+    @Column(name = "banNhap")
+    private Boolean banNhap = false;
+
     @ManyToOne
     @JoinColumn(name = "maGoiDichVu")
     @JsonBackReference
@@ -122,10 +124,6 @@ public class BatDongSan {
 
     @OneToMany(mappedBy = "batDongSan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DanhGia> danhGias = new ArrayList<>();
-
-    public enum LoaiDanhSach {
-        Bán, Cho_thuê
-    }
 
     public enum Huong {
         Đông, Tây, Nam, Bắc

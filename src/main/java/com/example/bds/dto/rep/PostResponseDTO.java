@@ -73,7 +73,7 @@ public class PostResponseDTO {
                 .description(entity.getMoTa())
                 .propertyType(entity.getLoaiBatDongSan())
                 // chuyển enum LoaiDanhSach sang String (ví dụ)
-                .listingType(entity.getLoaiDanhSach() == null ? null : entity.getLoaiDanhSach().name().replace('_', ' '))
+                .listingType(entity.getLoaiDanhSach() == null ? null : entity.getLoaiDanhSach())
                 .idUser(entity.getTaiKhoan() == null ? 0 : entity.getTaiKhoan().getId())
                 .idPricing(entity.getGoiDichVu() == null ? 0 : entity.getGoiDichVu().getId())
                 .views(entity.getLuotXem() == null ? 0 : entity.getLuotXem())

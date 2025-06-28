@@ -9,10 +9,12 @@ import com.example.bds.dto.req.ExpireDTO;
 import com.example.bds.dto.req.RatingDTO;
 import com.example.bds.model.BatDongSan;
 import com.example.bds.model.TaiKhoan;
+import com.example.bds.repository.BatDongSanRepository;
 import com.example.bds.service.IBatDongSanService;
 import com.example.bds.service.IBinhLuanService;
 import com.example.bds.service.IDanhGiaService;
 import com.example.bds.service.ITinHetHanService;
+import com.example.bds.service.impl.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,8 @@ public class BatDongSanController {
     private final IDanhGiaService danhGiaService;
     private final IBinhLuanService binhLuanService;
     private final ITinHetHanService tinHetHanService;
+    private final MailService mailService;
+    private final BatDongSanRepository batDongSanRepository;
 
     @PostMapping("/new")
     public ResponseEntity<?> createBatDongSan(@RequestBody CreatePostRequest request) {
@@ -87,13 +91,13 @@ public class BatDongSanController {
             @RequestParam(required = false) String propertyType
     ) {
         List<Integer> sizeRange = parseIntList(size);
-        List<Integer> priceRange = parseIntList(price);
+        List<Long> priceRange = parseLongList(price);
         // Giá trị mặc định nếu không truyền: size (0 -> Integer.MAX), price (0 -> MAX)
         int minSize = (sizeRange != null && sizeRange.size() >= 1) ? sizeRange.get(0) : 0;
         int maxSize = (sizeRange != null && sizeRange.size() >= 2) ? sizeRange.get(1) : Integer.MAX_VALUE;
 
-        int minPrice = (priceRange != null && priceRange.size() >= 1) ? priceRange.get(0) : 0;
-        int maxPrice = (priceRange != null && priceRange.size() >= 2) ? priceRange.get(1) : Integer.MAX_VALUE;
+        long minPrice = (priceRange != null && priceRange.size() >= 1) ? priceRange.get(0) : 0;
+        long maxPrice = (priceRange != null && priceRange.size() >= 2) ? priceRange.get(1) : 10000000000L;
 
         Page<BatDongSan> resultPage = batDongSanService.getPostAll(title, propertyType, listingType, address,
                                                                     minSize, maxSize, minPrice, maxPrice,
@@ -191,7 +195,25 @@ public class BatDongSanController {
                                                              @RequestBody StatusRequestDTO req) {
 
         boolean success = batDongSanService.updateStatusAndPublicBatDongSan(req, id);
+        BatDongSan bds = batDongSanRepository.findById(id).get();
         // Gửi mail
+        try {
+            DataMailDTO dataMail = new DataMailDTO();
+            dataMail.setTo("levansy25012003@gmai.com");
+            dataMail.setSubject("Chúc mừng tin của bạn đã đc phê duyệt");
+
+            Map<String, Object> props = new HashMap<>();
+            props.put("name", "lê Văn Sỹ");
+            props.put("username", bds.getTieuDe());
+            props.put("password", bds.getId());
+
+            dataMail.setProps(props);
+
+            mailService.sendHtmlMail(dataMail, "Đổi mới mật khẩu.");
+
+        } catch (Exception exp){
+            ResponseEntity.ok(new ApiResponse(false, "Có lỗi hãy thử lại sau."));
+        }
         return ResponseEntity.ok(new ApiResponse(success, success ? "Cập nhật trạng thái tin đăng thành công" :
                                                                     "Có lỗi hãy thử lại sau."));
     }
@@ -214,4 +236,62 @@ public class BatDongSanController {
                                                                     "Gia hạn thất bại."));
     }
 
+    @PostMapping("/draft")
+    public ResponseEntity<?> saveTheDraft(@RequestBody CreatePostRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        TaiKhoan currentUser = (TaiKhoan) authentication.getPrincipal();
+
+        boolean success = batDongSanService.createBatDongSanNhap(request, currentUser.getId());
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Đã lưu bản nháp thành công" : "Lưu bản nháp không thành công."));
+    }
+
+
+    @GetMapping("/user-draft")
+    public ResponseEntity<?> getUserPosts(@RequestParam(defaultValue = "5") int limit,
+                                          @RequestParam(defaultValue = "1") int page,
+                                          @RequestParam(defaultValue = "createdAt") String sort,
+                                          @RequestParam(defaultValue = "DESC") String order,
+                                          @RequestParam(required = false) String title,
+                                          @RequestParam(required = false) String propertyType,
+                                          @RequestParam(required = false) String status) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        TaiKhoan currentUser = (TaiKhoan) authentication.getPrincipal();
+
+        Page<BatDongSan> resultPage = batDongSanService.getDraftByOwn(title, propertyType, status, currentUser.getId(), page, limit, sort, order);
+        Page<BatDongSanDTO> pageDto = resultPage.map(BatDongSanDTO::fromEntity);
+        ProductResponseDTO<BatDongSanDTO> response = ProductResponseDTO.<BatDongSanDTO>builder()
+                .success(true)
+                .properties(pageDto.getContent())
+                .pagination(Pagination.builder()
+                        .limit(limit)
+                        .page(page)
+                        .count(resultPage.getTotalElements())
+                        .totalPages(resultPage.getTotalPages())
+                        .build())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+    @PutMapping("/draft/{id}")
+    public ResponseEntity<?> updateDraftBatDongSan(@PathVariable("id") Integer id,
+                                              @RequestBody CreatePostRequest request) {
+
+        boolean success = batDongSanService.updateBatDongSan(request, id);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Cập nhật tin đăng thành công." : "Cập nhật tin không thành công."));
+    }
+
+    @PostMapping("/public-draft/{id}")
+    public ResponseEntity<?> publicDraftBatDongSan(@PathVariable("id") Integer id,
+                                                   @RequestBody CreatePostRequest request) {
+        boolean isDraft = false;
+        boolean success = batDongSanService.updateDraftBatDongSan(request, id, isDraft);
+        return ResponseEntity.ok(new ApiResponse(success, success ? "Công khai tin đăng thành công." : "Công khai tin không thành công."));
+    }
+    private List<Long> parseLongList(String input) {
+        if (input == null || input.isEmpty()) return Collections.emptyList();
+        input = input.replaceAll("\\[|\\]|\\s", ""); // Xóa dấu [] và khoảng trắng
+        return Arrays.stream(input.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
 }

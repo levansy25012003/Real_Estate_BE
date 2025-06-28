@@ -87,6 +87,11 @@ ALTER TABLE BATDONGSAN
     MODIFY COLUMN loaiBatDongSan VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ALTER TABLE BATDONGSAN
     MODIFY COLUMN trangThai VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE batdongsan MODIFY COLUMN gia BIGINT;
+ALTER TABLE BATDONGSAN
+    ADD COLUMN banNhap BOOLEAN DEFAULT false;
+ALTER TABLE BATDONGSAN
+    MODIFY loaiDanhSach VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE DANHSACHYEUTHICH (
   maDsYeuThich INT AUTO_INCREMENT PRIMARY KEY,
@@ -237,3 +242,6 @@ select * from DONHANG;
 select * from GOIDICHVU;
 select * from TAIKHOAN;
 select * from THANHTOAN;
+select * from batdongsan where tinh = "Thành Phố Đà Nẵng";
+
+select * from batdongsan where l;
